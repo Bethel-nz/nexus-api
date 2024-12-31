@@ -1,0 +1,15 @@
+// Package imports
+import { Module } from '@nestjs/common';
+
+// Internal imports
+import { OrdersService } from './orders.service';
+import { OrdersController } from './orders.controller';
+import { PrismaModule } from 'src/prisma/prisma.module';
+
+@Module({
+	imports: [PrismaModule],
+	controllers: [OrdersController],
+	providers: [OrdersService],
+	exports: [OrdersService],
+})
+export class OrdersModule { } 
