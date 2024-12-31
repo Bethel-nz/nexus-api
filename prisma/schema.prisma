@@ -1,0 +1,72 @@
+datasource db {
+  provider = "postgresql" // or your preferred SQL database
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      UserRole
+  orders    Order[]
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  REGULAR
+}
+
+model Order {
+  id             String      @id @default(uuid())
+  description    String
+  specifications Json
+  quantity       Int
+  status         OrderStatus @default(REVIEW)
+  userId         String
+  user           User        @relation(fields: [userId], references: [id])
+  chatRoom       ChatRoom?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  REVIEW
+  PROCESSING
+  COMPLETED
+}
+
+model ChatRoom {
+  id        String    @id @default(uuid())
+  orderId   String    @unique
+  order     Order     @relation(fields: [orderId], references: [id])
+  messages  Message[]
+  isClosed  Boolean   @default(false)
+  summary   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([orderId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  chatRoomId String
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  createdAt  DateTime @default(now())
+
+  @@index([chatRoomId])
+  @@index([userId])
+}
