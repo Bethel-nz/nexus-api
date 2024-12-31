@@ -1,0 +1,248 @@
+{
+	"info": {
+		"_postman_id": "176eb91f-7357-4fbc-83c1-cd71985b8c10",
+		"name": "CheckIt Api Doc",
+		"description": "## Authentication\n\nAll authenticated endpoints require a JWT token in the Authorization header:\n\n```\nAuthorization: Bearer <token>\n\n ```\n\n### Register User\n\n``` json\nPOST /auth/register\nContent-Type: application/json\n{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"role\": \"REGULAR\"  // or \"ADMIN\"\n}\nResponse 201:\n{\n    \"id\": \"uuid\",\n    \"email\": \"user@example.com\",\n    \"role\": \"REGULAR\",\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n}\n\n ```\n\n### Login User\n\n``` json\nPOST /auth/login\nContent-Type: application/json\n{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}\nResponse 200:\n{\n    \"access_token\": \"eyJhbG...\"\n}\n\n ```\n\n---\n\n## Order\n\n### Create an Order\n\n``` json\nPOST /orders/new\nAuthorization: Bearer <token>\nContent-Type: application/json\n{\n    \"description\": \"Custom T-shirt design\",\n    \"specifications\": {\n        \"size\": \"XL\",\n        \"color\": \"blue\",\n        \"design\": \"logo.png\"\n    },\n    \"quantity\": 100\n}\nResponse 201:\n{\n    \"id\": \"uuid\",\n    \"description\": \"Custom T-shirt design\",\n    \"specifications\": { ... },\n    \"quantity\": 100,\n    \"status\": \"REVIEW\",\n    \"chatRoom\": {\n        \"id\": \"uuid\",\n        \"isClosed\": false\n    }\n}\n\n ```\n\n### List Orders\n\n``` json\nGET /orders?page=1&count=10\nAuthorization: Bearer <token>\nResponse 200:\n{\n    \"orders\": [\n        {\n            \"id\": \"uuid\",\n            \"description\": \"Custom T-shirt design\",\n            \"status\": \"REVIEW\",\n            \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n        }\n    ],\n    \"total\": 1\n}\n\n ```\n\n### Get Order Details\n\n``` json\nGET /orders/:id\nAuthorization: Bearer <token>\nResponse 200:\n{\n    \"id\": \"uuid\",\n    \"description\": \"Custom T-shirt design\",\n    \"specifications\": { ... },\n    \"quantity\": 100,\n    \"status\": \"REVIEW\",\n    \"chatRoom\": {\n        \"id\": \"uuid\",\n        \"isClosed\": false,\n        \"messages\": []\n    }\n}\n\n ```\n\n### Update Order Status (Admin Only)\n\n``` json\nPATCH /orders/:id/status\nAuthorization: Bearer <token>\nContent-Type: application/json\n{\n    \"status\": \"PROCESSING\"  // REVIEW, PROCESSING, COMPLETED\n}\nResponse 200:\n{\n    \"id\": \"uuid\",\n    \"status\": \"PROCESSING\",\n    \"updatedAt\": \"2024-01-01T00:00:00.000Z\"\n}\n\n ```\n\n---\n\n## Chat\n\n### Get Chat Room\n\n``` json\nGET /chat/:chatRoomId\nAuthorization: Bearer <token>\nResponse 200:\n{\n    \"id\": \"uuid\",\n    \"orderId\": \"uuid\",\n    \"isClosed\": false,\n    \"messages\": [\n        {\n            \"id\": \"uuid\",\n            \"content\": \"Hello\",\n            \"user\": {\n                \"id\": \"uuid\",\n                \"email\": \"user@example.com\"\n            },\n            \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n        }\n    ]\n}\n\n ```\n\n### Send Message\n\n``` json\nPOST /chat/:chatRoomId/messages\nAuthorization: Bearer <token>\nContent-Type: application/json\n{\n    \"content\": \"Hello, I have a question about my order\"\n}\nResponse 201:\n{\n    \"id\": \"uuid\",\n    \"content\": \"Hello, I have a question about my order\",\n    \"user\": {\n        \"id\": \"uuid\",\n        \"email\": \"user@example.com\"\n    },\n    \"createdAt\": \"2024-01-01T00:00:00.000Z\"\n}\n\n ```\n\n### Close Chat (Admin Only)\n\n``` json\nPOST /chat/:chatRoomId/close\nAuthorization: Bearer <token>\nContent-Type: application/json\n{\n    \"summary\": \"Issue resolved. Order specifications updated.\"\n}\nResponse 200:\n{\n    \"id\": \"uuid\",\n    \"isClosed\": true,\n    \"summary\": \"Issue resolved. Order specifications updated.\",\n    \"messages\": [ ... ]\n}\n\n ```\n\n---\n\n### Error Responses\n\n``` json\n{\n    \"statusCode\": 400,\n    \"message\": \"Validation failed\",\n    \"error\": \"Bad Request\"\n}\n{\n    \"statusCode\": 401,\n    \"message\": \"Unauthorized\"\n}\n{\n    \"statusCode\": 403,\n    \"message\": \"Forbidden\"\n}\n{\n    \"statusCode\": 404,\n    \"message\": \"Not found\"\n}\n\n ```\n\n---\n\n## WebSocket Events\n\nConnect to: ws://localhost:3000/chat\n\n``` typescript\nimport { io } from 'socket.io-client';\n// Authentication\nconst socket = io('http://localhost:3000/chat', {\n  extraHeaders: {\n    Authorization: `Bearer ${token}`\n  }\n});\n// Join chat room\nsocket.emit('joinRoom', 'CHAT_ROOM_ID');\n// Send message\nsocket.emit('sendMessage', {\n    chatRoomId: 'CHAT_ROOM_ID',\n    content: 'Hello'\n});\n// Listen for new messages\nsocket.on('newMessage', (message) => {\n    console.log('New message:', message);\n});\n\n ```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23151993"
+	},
+	"item": [
+		{
+			"name": "base",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000",
+					"host": [
+						"localhost"
+					],
+					"port": "3000"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"user@examp.com\",\r\n    \"password\": \"password123\",\r\n    \"role\": \"REGULAR\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/auth/register",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auth - login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"user@example.com\",\r\n    \"password\": \"password123\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/auth/login",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new - orders",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NGRlYzA4OS1lNGI5LTRiZGMtYWJlYy1hODc1NThkYmUzY2EiLCJlbWFpbCI6InVzZXJAZXhhbXAuY29tIiwicm9sZSI6IlJFR1VMQVIiLCJpYXQiOjE3MzU0MjU0MzcsImV4cCI6MTczNTUxMTgzN30.sQ6SiksPw_1TPdJIzuQ6BfyeZ_Zmdxmh99mOVxvOyHg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"description\": \"Custom T-shirt design - Blue\",\r\n    \"specifications\": {\r\n        \"size\": \"XL\",\r\n        \"color\": \"blue\",\r\n        \"design\": \"logo.png\"\r\n    },\r\n    \"quantity\": 100\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/new",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"new"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "all - orders",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NGRlYzA4OS1lNGI5LTRiZGMtYWJlYy1hODc1NThkYmUzY2EiLCJlbWFpbCI6InVzZXJAZXhhbXAuY29tIiwicm9sZSI6IlJFR1VMQVIiLCJpYXQiOjE3MzU0MjU0MzcsImV4cCI6MTczNTUxMTgzN30.sQ6SiksPw_1TPdJIzuQ6BfyeZ_Zmdxmh99mOVxvOyHg",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "single - order",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NGRlYzA4OS1lNGI5LTRiZGMtYWJlYy1hODc1NThkYmUzY2EiLCJlbWFpbCI6InVzZXJAZXhhbXAuY29tIiwicm9sZSI6IlJFR1VMQVIiLCJpYXQiOjE3MzU0MjU0MzcsImV4cCI6MTczNTUxMTgzN30.sQ6SiksPw_1TPdJIzuQ6BfyeZ_Zmdxmh99mOVxvOyHg",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "localhost:3000/orders/e33b7c7e-3b8c-4b22-919b-8ece886ea9eb",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"e33b7c7e-3b8c-4b22-919b-8ece886ea9eb"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update status - admin",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"PROCESSING\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/orders/e33b7c7e-3b8c-4b22-919b-8ece886ea9eb/status",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"orders",
+						"e33b7c7e-3b8c-4b22-919b-8ece886ea9eb",
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NGRlYzA4OS1lNGI5LTRiZGMtYWJlYy1hODc1NThkYmUzY2EiLCJlbWFpbCI6InVzZXJAZXhhbXAuY29tIiwicm9sZSI6IlJFR1VMQVIiLCJpYXQiOjE3MzU0MjU0MzcsImV4cCI6MTczNTUxMTgzN30.sQ6SiksPw_1TPdJIzuQ6BfyeZ_Zmdxmh99mOVxvOyHg",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"value": "",
+			"type": "string"
+		}
+	]
+}
