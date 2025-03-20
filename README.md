@@ -1,6 +1,91 @@
-# Agora API
+# Nexus API
 
-A NestJS-based API for order management and real-time chat communication between users and administrators.
+A service marketplace backend where users can place orders for services and communicate with service providers in real-time.
+
+## Core Features
+
+- **Order Management**: Create and manage service orders with status workflow
+- **Real-time Chat**: Dedicated chat rooms for each order
+- **User System**: Role-based access with JWT authentication
+- **Performance**: Redis caching, queue system, and metrics
+
+## Tech Stack
+
+- **Backend**: NestJS, PostgreSQL, Prisma
+- **Real-time**: Socket.io, Redis, BullMQ
+- **Monitoring**: Prometheus, Grafana
+- **Documentation**: Swagger/OpenAPI
+
+## Quick Start
+
+```bash
+# Clone and install
+git clone Bethel-nz/nexus-api
+cd nexus-api
+pnpm install
+
+# Setup environment
+cp .env.example .env
+
+# Start services
+docker-compose up -d
+pnpm prisma migrate deploy
+
+# Start development server
+pnpm start:dev
+```
+
+## Documentation
+
+- API Docs: `http://localhost:3000/api-docs`
+- Metrics: `http://localhost:3000/metrics`
+- Grafana: `http://localhost:3001` (admin/admin)
+
+## Roadmap
+
+### v1.1.0 (Planned)
+
+- [ ] Email notifications
+- [ ] File attachments in orders
+- [ ] Payment integration
+- [ ] Service provider ratings
+- [ ] Advanced search filters
+- [ ] Analytics dashboard
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## Features
+
+### Order Management
+
+- Users can create service orders with detailed specifications
+- Order workflow: REVIEW → PROCESSING → COMPLETED
+- Admins can manage and update order statuses
+
+### Real-time Communication
+
+- Each order has a dedicated chat room
+- Real-time messaging between clients and service providers
+- Instant notifications for new messages and status updates
+
+### User System
+
+- Role-based access control (Admin/Regular users)
+- JWT-based authentication
+- Secure password handling
+
+### Performance & Reliability
+
+- Redis caching for fast responses
+- Queue-based notification system
+- Real-time updates via WebSockets
+- Prometheus metrics and Grafana dashboards
 
 ## Prerequisites
 
@@ -8,63 +93,22 @@ A NestJS-based API for order management and real-time chat communication between
 - pnpm
 - PostgreSQL
 - Docker for local development and testing
-
-## Quick Start
-
-1. **Clone the repository**
-
-```bash
-git clone <repository-url>
-cd agora-api
-```
-
-2. **Environment Setup**
-
-```bash
-# Copy the example environment file
-cp .env.example .env
-
-# Update the .env file with your configuration
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/agora?schema=public"
-JWT_SECRET="your-secret-key"
-PORT=3000
-```
-
-3. **Using Docker (Recommended)**
-
-```bash
-# Start PostgreSQL and the API
-docker-compose up -d
-
-# Apply database migrations
-pnpm prisma migrate deploy
-```
-
-4. **Manual Setup**
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run database migrations
-pnpm prisma migrate deploy
-
-# Start the development server
-pnpm start:dev
-```
+- Redis (for caching and queue management)
 
 ## Testing
 
 ### Setup Test Database
+
 ```bash
 # Start test database
-docker-compose -f docker-compose.test.yml up -d
+docker-compose up -d
 
 # Run migrations on test database
 NODE_ENV=test pnpm prisma migrate deploy
 ```
 
 ### Run Tests
+
 ```bash
 # Run all tests
 pnpm test
@@ -78,29 +122,33 @@ pnpm test:cov
 
 ## API Documentation
 
-API documentation is available in the `/docs` folder or click below for quick access:
-
+- Swagger UI available at: `http://localhost:3000/api-docs`
 - [POSTMAN_COLLECTION](./doc/CheckIt%20Api%20Doc.postman_collection.json) - Postman collection
 
-## Project Structure
+## Monitoring & Observability
 
-``` text
-src/
-├── modules/
-│   ├── auth/       # Authentication
-│   ├── chat/       # Chat functionality
-│   ├── orders/     # Order management
-│   └── users/      # User management
-├── common/         # Shared utilities
-├── prisma/        # Database schema and migrations
-└── utils/         # Helper functions
-```
+### Prometheus Metrics
 
-## Database Schema
+Metrics endpoint available at: `http://localhost:3000/metrics`
 
-The project uses Prisma with PostgreSQL. Key models:
+Key metrics include:
 
-- User (Admin/Regular)
-- Order (with status workflow)
-- ChatRoom (linked to orders)
-- Message (for chat history)
+- HTTP request rates and latencies
+- Queue processing metrics
+- Cache hit/miss ratios
+- System resources
+
+### Grafana Dashboards
+
+Access Grafana at: `http://localhost:3001`
+
+- Default credentials: admin/admin
+- Pre-configured dashboards for:
+  - API performance monitoring
+  - Queue metrics
+  - Cache performance
+  - System health
+
+## License
+
+[MIT](LICENSE)
