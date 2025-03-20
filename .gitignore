@@ -58,3 +58,5 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Migrations should be user-specific and shouldnt be committed since it contains sensitive data
 prisma/migrations
+
+*.aisettings
