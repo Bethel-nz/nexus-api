@@ -9,9 +9,21 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './modules/auth/guards/roles.guard';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { RedisCacheModule } from './modules/cache/cache.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
+import { MonitoringModule } from './monitoring/monitoring.module';
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, OrdersModule, ChatModule],
+  imports: [
+    PrismaModule,
+    RedisCacheModule,
+    MonitoringModule,
+    NotificationsModule,
+    UsersModule,
+    AuthModule,
+    OrdersModule,
+    ChatModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
@@ -25,4 +37,4 @@ import { ChatModule } from './modules/chat/chat.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}
