@@ -7,10 +7,11 @@ describe('PrismaService', () => {
 
   beforeAll(async () => {
     // Ensure we're using test database
-    process.env.DATABASE_URL = "postgresql://postgres:postgres@localhost:5434/agora_test?schema=public";
+    process.env.DATABASE_URL =
+      'postgresql://postgres:postgres@localhost:5434/nexus_test?schema=public';
 
     // Wait for test database to be ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Run migrations on test database
     execSync('npx prisma migrate deploy');
@@ -37,25 +38,25 @@ describe('PrismaService', () => {
 
   describe('User Operations', () => {
     const testUser = {
-      email: "jane@testmail.com",
-      password: "some-super-secret-key",
-      role: "REGULAR" as const,
+      email: 'jane@testmail.com',
+      password: 'some-super-secret-key',
+      role: 'REGULAR' as const,
     };
 
-    it("should create a new user", async () => {
+    it('should create a new user', async () => {
       const newUser = await service.user.create({
-        data: testUser
+        data: testUser,
       });
 
-      expect(newUser).toHaveProperty("id");
+      expect(newUser).toHaveProperty('id');
       expect(newUser.email).toBe(testUser.email);
       expect(newUser.role).toBe(testUser.role);
     });
 
-    it("should throw an error on duplicate email", async () => {
+    it('should throw an error on duplicate email', async () => {
       // Create initial user
       await service.user.create({
-        data: testUser
+        data: testUser,
       });
 
       // Try to create duplicate
@@ -63,8 +64,8 @@ describe('PrismaService', () => {
         service.user.create({
           data: {
             ...testUser,
-            password: "different-password"
-          }
+            password: 'different-password',
+          },
         })
       ).rejects.toThrow(/Unique constraint failed/);
     });
